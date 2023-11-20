@@ -10,8 +10,8 @@ const String boxKey = "only_user";
 
 void main() async {
   Hive.init(Directory.current.path);
-  Hive.registerAdapter<User>(UserAdapter());
-  await Hive.openBox<User>(userBoxName);
+  Hive.registerAdapter<Admin>(AdminAdapter());
+  await Hive.openBox<Admin>(userBoxName);
   runApp(const MyApp());
 }
 
@@ -32,6 +32,15 @@ class User extends Person {
   String email;
 
   User({required String name, required int age, required this.email}) : super(name: name, age: age);
+}
+
+@HiveType(typeId: 2)
+class Admin extends Person {
+
+  @HiveField(2)
+  String priviledge;
+
+  Admin({required String name, required int age, required this.priviledge}): super(name: name, age: age);
 }
 
 class MyApp extends StatelessWidget {
@@ -85,17 +94,17 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  late final User _user;
+  late final Admin _admin;
 
-  var box = Hive.box<User>(userBoxName);
+  var box = Hive.box<Admin>(userBoxName);
 
   @override
   void initState() {
     if (box.containsKey(boxKey)) {
-      _user = box.get(boxKey)!;
+      _admin = box.get(boxKey)!;
     } else {
-      _user = User(name: "sami-bre", age: 22, email: "samibre121@gmail.com");
-      box.put(boxKey, _user);
+      _admin = Admin(name: "sami-bre", age: 22, priviledge: "warden");
+      box.put(boxKey, _admin);
     }
     super.initState();
   }
@@ -107,9 +116,9 @@ class _MyHomePageState extends State<MyHomePage> {
       // so that the display can reflect the updated values. If we changed
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
-      _user.age += 1;
+      _admin.age += 1;
     });
-    box.put(boxKey, _user);
+    box.put(boxKey, _admin);
   }
 
   @override
@@ -153,7 +162,7 @@ class _MyHomePageState extends State<MyHomePage> {
               'You have pushed the button this many times:',
             ),
             Text(
-              '${_user.age}',
+              '${_admin.age}',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
           ],
