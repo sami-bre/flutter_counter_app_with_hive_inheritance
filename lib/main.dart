@@ -15,15 +15,23 @@ void main() async {
   runApp(const MyApp());
 }
 
-@HiveType(typeId: 1)
-class User {
+@HiveType(typeId: 0)
+class Person {
   @HiveField(0)
   String name;
 
   @HiveField(1)
   int age;
 
-  User({required this.name, required this.age});
+  Person({required this.name, required this.age});
+}
+
+@HiveType(typeId: 1)
+class User extends Person {
+  @HiveField(2)
+  String email;
+
+  User({required String name, required int age, required this.email}) : super(name: name, age: age);
 }
 
 class MyApp extends StatelessWidget {
@@ -86,7 +94,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (box.containsKey(boxKey)) {
       _user = box.get(boxKey)!;
     } else {
-      _user = User(name: "sami-bre", age: 22);
+      _user = User(name: "sami-bre", age: 22, email: "samibre121@gmail.com");
       box.put(boxKey, _user);
     }
     super.initState();
