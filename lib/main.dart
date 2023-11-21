@@ -5,13 +5,14 @@ import 'package:hive/hive.dart';
 
 part 'main.g.dart';
 
-const String userBoxName = "user_box";
-const String boxKey = "only_user";
+const String personBoxName = "person_box";
+const String personKey = "only_person";
 
 void main() async {
   Hive.init(Directory.current.path);
-  Hive.registerAdapter<Admin>(AdminAdapter());
-  await Hive.openBox<Admin>(userBoxName);
+  Hive.registerAdapter<Person>(PersonAdapter());
+  Hive.registerAdapter<Dog>(DogAdapter());
+  await Hive.openBox<Person>(personBoxName);
   runApp(const MyApp());
 }
 
@@ -21,26 +22,22 @@ class Person {
   String name;
 
   @HiveField(1)
-  int age;
+  Dog dog;
 
-  Person({required this.name, required this.age});
+  
+
+  Person({required this.name, required this.dog});
 }
 
 @HiveType(typeId: 1)
-class User extends Person {
-  @HiveField(2)
-  String email;
+class Dog {
+  @HiveField(0)
+  String name;
 
-  User({required String name, required int age, required this.email}) : super(name: name, age: age);
-}
+  @HiveField(1)
+  int age;
 
-@HiveType(typeId: 2)
-class Admin extends Person {
-
-  @HiveField(2)
-  String priviledge;
-
-  Admin({required String name, required int age, required this.priviledge}): super(name: name, age: age);
+  Dog({required this.name, required this.age});
 }
 
 class MyApp extends StatelessWidget {
@@ -94,17 +91,18 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  late final Admin _admin;
+  late final Person _person;
 
-  var box = Hive.box<Admin>(userBoxName);
+  var box = Hive.box<Person>(personBoxName);
 
   @override
   void initState() {
-    if (box.containsKey(boxKey)) {
-      _admin = box.get(boxKey)!;
+    if (box.containsKey(personKey)) {
+      _person = box.get(personKey)!;
     } else {
-      _admin = Admin(name: "sami-bre", age: 22, priviledge: "warden");
-      box.put(boxKey, _admin);
+      var dog = Dog(name: "buchi", age: 12);
+      _person = Person(name: "sami-bre", dog: dog);
+      box.put(personKey, _person);
     }
     super.initState();
   }
@@ -116,9 +114,9 @@ class _MyHomePageState extends State<MyHomePage> {
       // so that the display can reflect the updated values. If we changed
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
-      _admin.age += 1;
+      _person.dog.age += 1;
     });
-    box.put(boxKey, _admin);
+    box.put(personKey, _person);
   }
 
   @override
@@ -162,7 +160,7 @@ class _MyHomePageState extends State<MyHomePage> {
               'You have pushed the button this many times:',
             ),
             Text(
-              '${_admin.age}',
+              '${_person.dog.age}',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
           ],
